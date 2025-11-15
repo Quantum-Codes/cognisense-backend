@@ -7,6 +7,38 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = ">=3.12"
-transformers = ">=4.57.1,<5.0.0"
+python = ">=3.12,<4.0"
+
+# Web Framework
 fastapi = {extras = ["standard"], version = "^0.121.1"}
+uvicorn = {extras = ["standard"], version = "^0.34.0"}
+
+# Database
+sqlmodel = "^0.0.25"
+alembic = "^1.14.0"
+psycopg2-binary = "^2.9.10"  # PostgreSQL adapter
+
+# Authentication (will be added later to avoid version conflicts for now)
+# fastapi-users = {extras = ["sqlalchemy"], version = "^13.0.0"}
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+passlib = {extras = ["bcrypt"], version = "^1.7.4"}
+
+# ML & NLP
+transformers = ">=4.35.0,<5.0.0"
+# torch will be installed as a dependency of transformers
+
+# Configuration & Environment
+pydantic-settings = "^2.7.0"
+
+# Utilities
+httpx = "^0.28.1"  # Async HTTP client
+loguru = "^0.7.3"   # Better logging
+# python-multipart included with fastapi[standard]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.4"
+pytest-asyncio = "^0.24.0"
+pytest-cov = "^6.0.0"
+httpx = "^0.28.1"  # For testing
+ruff = "^0.9.2"     # Linting & formatting
+ipython = "^8.31.0" # Better REPL
