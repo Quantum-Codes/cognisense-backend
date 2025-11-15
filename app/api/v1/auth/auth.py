@@ -1,9 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, status, Header
-from supabase import create_client, Client
+from pydantic import BaseModel, EmailStr
 
 from app.core.config import settings
+from app.core.supabase_client import supabase
 
 router = APIRouter()
+
+
+# Pydantic model for signup request
+class SignupRequest(BaseModel):
+    email: EmailStr
+    password: str
+
 
 def get_bearer_token(authorization: str) -> str:
     """Extract Bearer token from Authorization header. Raises HTTPException if malformed."""
@@ -24,7 +32,6 @@ async def get_current_user(request: Request, authorization: str = Header(...)):
     if not settings.SUPABASE_URL or not settings.SUPABASE_KEY:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="SUPABASE_URL or SUPABASE_KEY not configured")
 
-    supabase: Client = create_client(settings.SUPABASE_URL, settings.SUPABASE_KEY)
     try:
         user = supabase.auth.get_user(token)
     except Exception as e:
