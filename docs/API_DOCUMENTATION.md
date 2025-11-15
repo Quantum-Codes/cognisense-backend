@@ -266,22 +266,23 @@ Analyze text content for sentiment, emotions, and content categorization.
         "score": 0.89
       },
       {
-        "label": "excitement",
+        "label": "surprise",
         "score": 0.07
       },
       {
-        "label": "optimism",
+        "label": "neutral",
         "score": 0.03
       },
       {
-        "label": "neutral",
+        "label": "anger",
         "score": 0.01
       }
     ],
     "balance": {
       "positive_score": 0.99,
       "negative_score": 0.01,
-      "balance": 0.99
+      "balance": 0.99,
+      "is_balanced": false
     }
   }
 }
@@ -294,7 +295,7 @@ Analyze text content for sentiment, emotions, and content categorization.
 | text_length | integer | Character count of analyzed text |
 | word_count | integer | Word count of analyzed text |
 | url | string | Source URL (if provided) |
-| sentiment.label | string | Sentiment classification (POSITIVE, NEGATIVE, NEUTRAL) |
+| sentiment.label | string | Sentiment classification (POSITIVE, NEGATIVE) |
 | sentiment.score | float | Confidence score (0.0-1.0) |
 | category.primary | string | Primary content category |
 | category.confidence | float | Confidence score for primary category |
@@ -304,6 +305,7 @@ Analyze text content for sentiment, emotions, and content categorization.
 | emotions.balance.positive_score | float | Sum of positive emotion scores |
 | emotions.balance.negative_score | float | Sum of negative emotion scores |
 | emotions.balance.balance | float | Emotional balance ratio (0.0=negative, 1.0=positive) |
+| emotions.balance.is_balanced | boolean | Whether emotions are balanced (balance between 0.4-0.6) |
 
 **Available Content Categories**
 - Productivity
@@ -318,16 +320,13 @@ Analyze text content for sentiment, emotions, and content categorization.
 - Other
 
 **Available Emotions**
-- joy
-- sadness
 - anger
-- fear
 - disgust
-- surprise
-- love
-- optimism
-- excitement
+- fear
+- joy
 - neutral
+- sadness
+- surprise
 
 **Status Codes**
 - `200`: Analysis completed successfully
@@ -412,18 +411,19 @@ Analyze multiple text contents in a single request.
           "score": 0.87
         },
         {
-          "label": "love",
+          "label": "surprise",
           "score": 0.10
         },
         {
-          "label": "excitement",
+          "label": "neutral",
           "score": 0.03
         }
       ],
       "balance": {
         "positive_score": 1.0,
         "negative_score": 0.0,
-        "balance": 1.0
+        "balance": 1.0,
+        "is_balanced": false
       }
     }
   },
@@ -464,18 +464,19 @@ Analyze multiple text contents in a single request.
           "score": 0.65
         },
         {
-          "label": "excitement",
+          "label": "surprise",
           "score": 0.20
         },
         {
-          "label": "curiosity",
+          "label": "joy",
           "score": 0.15
         }
       ],
       "balance": {
         "positive_score": 0.35,
         "negative_score": 0.0,
-        "balance": 1.0
+        "balance": 1.0,
+        "is_balanced": false
       }
     }
   }
@@ -540,7 +541,7 @@ Currently, there are no rate limits implemented, but they may be added in future
 ### Sentiment Analysis Result
 ```json
 {
-  "label": "POSITIVE|NEGATIVE|NEUTRAL",
+  "label": "POSITIVE|NEGATIVE",
   "score": 0.0-1.0
 }
 ```
@@ -572,7 +573,8 @@ Currently, there are no rate limits implemented, but they may be added in future
 {
   "positive_score": 0.0-1.0,
   "negative_score": 0.0-1.0,
-  "balance": 0.0-1.0
+  "balance": 0.0-1.0,
+  "is_balanced": true|false
 }
 ```
 
@@ -692,11 +694,19 @@ const login = async (email, password) => {
 - Text inputs are automatically truncated to 512 words for optimal model performance
 - Empty or whitespace-only text will return default/neutral results with appropriate error messages
 
+### Emotional Balance Calculation
+The emotional balance is calculated using predefined emotion categories:
+- **Positive emotions**: joy, love, surprise (Note: 'love' is not returned by the current emotion model)
+- **Negative emotions**: anger, sadness, fear, disgust
+- **Neutral emotions**: neutral (not included in balance calculation)
+- **Balance score**: Ratio of positive to total emotional intensity (0.0 = very negative, 1.0 = very positive)
+- **Is balanced**: True when balance score is between 0.4 and 0.6
+
 ### Model Information
-- **Sentiment Analysis**: Uses pre-trained transformer models via Hugging Face
-- **Emotion Detection**: Multi-label emotion classification with confidence scores
-- **Category Classification**: Zero-shot classification for content categorization
-- **Model Loading**: Models are loaded once at startup and cached in memory
+- **Sentiment Analysis**: Uses `distilbert-base-uncased-finetuned-sst-2-english` via Hugging Face for binary sentiment classification (POSITIVE/NEGATIVE)
+- **Emotion Detection**: Uses `j-hartmann/emotion-english-distilroberta-base` for 7-emotion classification (anger, disgust, fear, joy, neutral, sadness, surprise)
+- **Category Classification**: Uses `facebook/bart-large-mnli` for zero-shot content categorization with 10 predefined categories
+- **Model Loading**: Models are loaded once at startup and cached in memory for optimal performance
 
 ### CORS Configuration
 The API is configured with CORS middleware to allow requests from browser extensions and web applications.
