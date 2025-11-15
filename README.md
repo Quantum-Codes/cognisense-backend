@@ -262,6 +262,7 @@ MIT License
 ## 👥 Authors
 
 - **Dhruv Pokhriyal** - [GitHub](https://github.com/DhruvPokhriyal)
+- **Ankit Sinha** - [GitHub](https://github.com/Quantum-Codes)
 
 ---
 
