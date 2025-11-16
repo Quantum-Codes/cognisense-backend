@@ -7,7 +7,7 @@ readme = "README.md"
 package-mode = false
 
 [tool.poetry.dependencies]
-python = ">=3.12,<4.0"
+python = ">=3.12,<3.15"
 
 # Web Framework
 fastapi = {extras = ["standard"], version = "^0.121.1"}
@@ -35,6 +35,7 @@ httpx = "^0.28.1"  # Async HTTP client
 loguru = "^0.7.3"   # Better logging
 # python-multipart included with fastapi[standard]
 supabase = "^2.24.0"
+torch = "^2.9.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.4"
